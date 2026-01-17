@@ -508,14 +508,6 @@ case-3-automation-agent/
 
 ---
 
-## 📞 联系方式
-
-- **项目负责人**: mia@dtmastercarbon.fr
-- **技术支持**: 请在GitHub Issues中提问
-- **文档**: 见 `docs/` 目录
-
----
-
 ## 🎓 相关资源
 
 - [Anthropic Claude API文档](https://docs.anthropic.com/)
