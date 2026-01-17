@@ -1,0 +1,129 @@
+template:
+  path: data/影响评估方法论_完整中文版.docx
+  output_dir: output
+  backup_original: true
+insert_rules:
+- name: Company Overview
+  insert_position:
+    method: after_paragraph
+    target_text: 目的
+    target_style: Heading 1
+  content_type: template
+  template: 'Company Name: {company_name}
+
+    Contact: {contact_name}
+
+    SDG Goals: {sdg_goals}
+
+
+    Implementation Plan:
+
+    {implementation_description}
+
+
+    ---
+
+    Data Source Status:
+
+    {data_source_status}
+
+    ---
+
+    '
+  data_source:
+    model: SDGResponse
+    fields:
+    - company_name
+    - contact_name
+    - sdg_goals
+    - implementation_description
+  style:
+    preserve_original: true
+    font_size: 11
+    font_name: Arial
+- name: Stakeholder Analysis
+  insert_position:
+    method: after_paragraph
+    target_text: 基本原则
+    target_style: Heading 1
+  content_type: ai_generated
+  prompt_template: '基于以下数据，生成利益相关者分析段落：
+
+
+    公司：{company_name}
+
+    利益相关者列表：{stakeholders}
+
+
+    要求：
+
+    1. 自然语言描述
+
+    2. 每个利益相关者的重要性
+
+    3. 符合影响评估方法论原则
+
+    4. 所有陈述必须基于提供的数据
+
+    '
+  data_source:
+    model: CompanyImpactData
+    fields:
+    - company_name
+    - stakeholders
+  ai_config:
+    model: claude-sonnet-4-5
+    max_tokens: 1000
+    temperature: 0.3
+  validation:
+    require_grounding: true
+- name: Impact Mechanisms
+  insert_position:
+    method: after_section
+    target_text: 第二阶段：研究
+    target_style: Heading 2
+  content_type: structured_table
+  data_source:
+    model: CompanyImpactData
+    field: mechanisms
+  table_config:
+    columns:
+    - name: Stakeholder
+      field: stakeholder_affected
+      width: 2.0
+    - name: Mechanism
+      field: mechanism
+      width: 3.5
+    - name: Type
+      field: type_of_impact
+      width: 1.5
+    - name: Value
+      field: value
+      width: 1.0
+      format: '{:.2f}'
+    - name: Unit
+      field: unit
+      width: 1.0
+    style:
+      header_bold: true
+      header_background: D3D3D3
+      border: true
+- name: Traceability Appendix
+  insert_position:
+    method: end_of_document
+  content_type: traceability
+  data_source:
+    model: GenerationResult
+    field: traceability_map
+  format:
+    include_citations: true
+    group_by_section: true
+validation:
+  check_all_placeholders_filled: true
+  check_no_hallucination: true
+  check_data_consistency: true
+  generate_validation_report: true
+output:
+  filename_pattern: '{company_name}_Impact_Assessment_Report_{date}.docx'
+  include_metadata: true
+  generate_traceability_json: true
